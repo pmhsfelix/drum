@@ -84,11 +84,17 @@ namespace Drum
         {
             _uriMaker = new UriMaker(mapper, urlHelper);
         }
+
+        public UriMaker(UriMakerFactory fact, HttpRequestMessage req)
+            : this(fact.Mapper, new UrlHelper(req))
+        {}
     }
 
     public class UriMakerFactory
     {
         private readonly Func<MethodInfo, RouteEntry> _mapper;
+
+        public Func<MethodInfo, RouteEntry> Mapper { get { return _mapper; } }
 
         public UriMakerFactory(Func<MethodInfo,RouteEntry> mapper)
         {
