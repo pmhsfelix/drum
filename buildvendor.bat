@@ -1,0 +1,1 @@
+msbuild vendor\Strathweb.TypedRouting\Strathweb.TypedRouting\Strathweb.TypedRouting.csproj
