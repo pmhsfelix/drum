@@ -1,0 +1,3 @@
+[submodule "vendor/Strathweb.TypedRouting"]
+	path = vendor/Strathweb.TypedRouting
+	url = https://github.com/filipw/Strathweb.TypedRouting.git
