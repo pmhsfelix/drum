@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net.Http;
 using System.Reflection;
 using System.Web.Http;
 using System.Web.Http.Routing;
@@ -16,10 +17,13 @@ namespace Drum
             "Add",
             new Type[] { typeof(string), typeof(object) });
 
-        public UriMaker(UrlHelper urlHelper)
+        private readonly Func<MethodInfo, RouteEntry> _mapper;
+
+
+        public UriMaker(Func<MethodInfo, RouteEntry> mapper, UrlHelper urlHelper)
         {
             _urlHelper = urlHelper;
-
+            _mapper = mapper;
         }
 
         public Uri UriFor<T>(Expression<Action<T>> action)
@@ -34,14 +38,12 @@ namespace Drum
             var actionParameters = actionMethod.GetParameters();
 
             // Get the route
-            var route = actionMethod.GetCustomAttributes(typeof(RouteAttribute), true)
-                .Cast<RouteAttribute>()
-                .FirstOrDefault(r => !String.IsNullOrEmpty(r.Name));
-            if (route == null)
+            var route = _mapper(actionMethod);
+            if(route == null)
             {
-                throw new InvalidOperationException("Action method must have a named Route attribute");
+                throw new Exception("Unable to find route");
             }
-
+            
             if (methodCall.Arguments.Count == 0)
             {
                 return new Uri(_urlHelper.Link(route.Name, new { }));
@@ -78,9 +80,29 @@ namespace Drum
             return _uriMaker.UriFor(action);
         }
 
-        public UriMaker(UrlHelper urlHelper)
+        public UriMaker(Func<MethodInfo,RouteEntry> mapper, UrlHelper urlHelper)
         {
-            _uriMaker = new UriMaker(urlHelper);
+            _uriMaker = new UriMaker(mapper, urlHelper);
+        }
+    }
+
+    public class UriMakerFactory
+    {
+        private readonly Func<MethodInfo, RouteEntry> _mapper;
+
+        public UriMakerFactory(Func<MethodInfo,RouteEntry> mapper)
+        {
+            _mapper = mapper;
+        }
+
+        public UriMaker<TController> NewUriMakerFor<TController>(UrlHelper urlHelper)
+        {
+            return new UriMaker<TController>(_mapper, urlHelper);
+        }
+
+        public UriMaker<TController> NewUriMakerFor<TController>(HttpRequestMessage request)
+        {
+            return new UriMaker<TController>(_mapper, new UrlHelper(request));
         }
     }
 }

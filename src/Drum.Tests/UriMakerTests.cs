@@ -15,38 +15,55 @@ namespace Drum.Tests
         [RoutePrefix("api/resources")]
         public class ResourceController : ApiController
         {
-            [Route("", Name = "GetAll")]
+            [Route("")]
             public void GetAll() { }
 
-            [Route("", Name = "GetAllPaged")]
+            [Route("")]
             public void GetPaged(int page, int count) { }
 
-            [Route("{id}", Name = "GetById")]
+            [Route("{id}")]
             public void GetById(int id) { }
 
-            [Route("", Name = "GetByProp1")]
-            public void GetByProp1(string prop1) { }
-
-            [Route("", Name = "GetByProp2")]
-            public void GetByProp2(string prop2) { }
-
+            [Route("{id}")]
+            public void GetById(int id, bool detailed) { }
         }
         
         [Fact]
-        public void Fact()
+        public void Can_make_uri_for_action_without_prms()
         {
             var uri = _uriMaker.UriFor(c => c.GetAll());
             Assert.Equal("http://example.org/api/resources", uri.ToString());
         }
 
+        [Fact]
+        public void Can_make_uri_for_action_with_multiple_prms()
+        {
+            var uri = _uriMaker.UriFor(c => c.GetPaged(0, 10));
+            Assert.Equal("http://example.org/api/resources?page=0&count=10", uri.ToString());
+        }
+
+        [Fact]
+        public void Can_make_uri_for_action_with_template_prms()
+        {
+            var uri = _uriMaker.UriFor(c => c.GetById(123));
+            Assert.Equal("http://example.org/api/resources/123", uri.ToString());
+        }
+
+        [Fact]
+        public void Can_make_uri_for_action_with_template_prms_and_qs_prms()
+        {
+            var uri = _uriMaker.UriFor(c => c.GetById(123, true));
+            Assert.Equal("http://example.org/api/resources/123?detailed=True", uri.ToString());
+        }
+        
         public UriMakerTests()
         {
             var config = new HttpConfiguration();
-            config.MapHttpAttributeRoutes();
+            var factory = config.MapHttpAttributeRoutesAndUseUriMaker(new DefaultDirectRouteProvider());
             config.EnsureInitialized();
             var req = new HttpRequestMessage(HttpMethod.Get,"http://example.org");
             req.SetConfiguration(config);
-            _uriMaker = new UriMaker<ResourceController>(new UrlHelper(req));
+            _uriMaker = factory.NewUriMakerFor<ResourceController>(req);
         }
 
         private readonly UriMaker<ResourceController> _uriMaker;
