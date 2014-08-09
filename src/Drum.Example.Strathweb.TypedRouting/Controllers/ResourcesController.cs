@@ -4,40 +4,34 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using System.Web.Http.Routing;
 
-namespace Drum.Example.Controllers
+namespace Drum.Example.Strathweb.TypedRouting.Controllers
 {
-    [RoutePrefix("api/resources")]
-    public class ResourceController : ApiController
+    public class ResourcesController : ApiController
     {
-        [Route("")]
         public ResourceState GetAll()
         {
-            var maker = Request.TryGetUriMakerFor<ResourceController>();
+            var maker = Request.TryGetUriMakerFor<ResourcesController>();
             return new ResourceState
             {
                 self = maker.UriFor(c => c.GetAll()),
                 next = maker.UriFor(c => c.GetPaged(1, 10)),
                 first = maker.UriFor(c => c.GetById(0)),
-                first_alternative = maker.UriFor(c => c.GetById(0,true))
+                first_alternative = maker.UriFor(c => c.GetByIdDetailed(0, true))
             };
         }
 
-        [Route("")]
         public void GetPaged(int page, int count)
         {
             throw new NotImplementedException();
         }
 
-        [Route("{id}")]
         public void GetById(int id)
         {
             throw new NotImplementedException();
         }
 
-        [Route("{id}")]
-        public void GetById(int id, bool detailed)
+        public void GetByIdDetailed(int id, bool detailed)
         {
             throw new NotImplementedException();
         }
