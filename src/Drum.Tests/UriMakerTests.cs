@@ -12,7 +12,7 @@ namespace Drum.Tests
 {
     public class UriMakerTests
     {
-        [RoutePrefix("api/resources")]
+        [RoutePrefix("api/UriMakerTests/resources")]
         public class ResourceController : ApiController
         {
             [Route("")]
@@ -32,28 +32,28 @@ namespace Drum.Tests
         public void Can_make_uri_for_action_without_prms()
         {
             var uri = _uriMaker.UriFor(c => c.GetAll());
-            Assert.Equal("http://example.org/api/resources", uri.ToString());
+            Assert.Equal("http://example.org/api/UriMakerTests/resources", uri.ToString());
         }
 
         [Fact]
         public void Can_make_uri_for_action_with_multiple_prms()
         {
             var uri = _uriMaker.UriFor(c => c.GetPaged(0, 10));
-            Assert.Equal("http://example.org/api/resources?page=0&count=10", uri.ToString());
+            Assert.Equal("http://example.org/api/UriMakerTests/resources?page=0&count=10", uri.ToString());
         }
 
         [Fact]
         public void Can_make_uri_for_action_with_template_prms()
         {
             var uri = _uriMaker.UriFor(c => c.GetById(123));
-            Assert.Equal("http://example.org/api/resources/123", uri.ToString());
+            Assert.Equal("http://example.org/api/UriMakerTests/resources/123", uri.ToString());
         }
 
         [Fact]
         public void Can_make_uri_for_action_with_template_prms_and_qs_prms()
         {
             var uri = _uriMaker.UriFor(c => c.GetById(123, true));
-            Assert.Equal("http://example.org/api/resources/123?detailed=True", uri.ToString());
+            Assert.Equal("http://example.org/api/UriMakerTests/resources/123?detailed=True", uri.ToString());
         }
         
         public UriMakerTests()

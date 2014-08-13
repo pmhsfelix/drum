@@ -9,10 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Drum.Tests", "Drum.Tests\Dr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Drum.Example", "Drum.Example\Drum.Example.csproj", "{6319CE82-A460-4103-BF9D-BE0F90A415F9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Drum.Example.Strathweb.TypedRouting", "Drum.Example.Strathweb.TypedRouting\Drum.Example.Strathweb.TypedRouting.csproj", "{CFA14975-D459-4D27-84C0-7701E62D34D6}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Drum.Example.Autofac", "Drum.Example.Autofac\Drum.Example.Autofac.csproj", "{8E2B77F1-2C6E-4713-BD16-E1E494381AF7}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,14 +27,6 @@ Global
 		{6319CE82-A460-4103-BF9D-BE0F90A415F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6319CE82-A460-4103-BF9D-BE0F90A415F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6319CE82-A460-4103-BF9D-BE0F90A415F9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CFA14975-D459-4D27-84C0-7701E62D34D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CFA14975-D459-4D27-84C0-7701E62D34D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CFA14975-D459-4D27-84C0-7701E62D34D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CFA14975-D459-4D27-84C0-7701E62D34D6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8E2B77F1-2C6E-4713-BD16-E1E494381AF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8E2B77F1-2C6E-4713-BD16-E1E494381AF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8E2B77F1-2C6E-4713-BD16-E1E494381AF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8E2B77F1-2C6E-4713-BD16-E1E494381AF7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
