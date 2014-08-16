@@ -9,7 +9,7 @@
 #---------------------------------#
 
 # version format
-version: 0.1.{build}
+version: 0.1.0-beta{build}
 
 #---------------------------------#
 #    environment configuration    #
@@ -25,8 +25,8 @@ clone_folder: c:\projects\drum
 assembly_info:
   patch: true
   file: AssemblyInfo.*
-  assembly_version: "0.1.0-beta{build}"
-  assembly_file_version: "{version}"
+  assembly_version: "0.1.0"
+  assembly_file_version: "0.1.0"
   assembly_informational_version: "{version}"
 
 #---------------------------------#
@@ -71,6 +71,12 @@ artifacts: []
 #---------------------------------#
 #     deployment configuration    #
 #---------------------------------#
+
+deploy:
+  provider: NuGet  
+  api_key:
+    secure: RBbVRxtACiB2I4L0VSgWVx8Tf/L6HsA5rHVFFrdUvOnHWUSopbrqaBzsFr+Y7tT7
+  artifact: /.*\.nupkg/
 
 #---------------------------------#
 #        global handlers          #
