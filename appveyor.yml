@@ -44,6 +44,9 @@ platform: Any CPU
 # build Configuration, i.e. Debug, Release, etc.
 configuration: Release
 
+build:
+  project: src\drum.sln
+
 # scripts to run before build
 before_build:
 - git submodule init
