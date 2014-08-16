@@ -44,16 +44,17 @@ namespace Drum.Tests
         [RoutePrefix("api/autofac/resources")]
         public class InjectionController : ApiController
         {
+            private readonly UriMaker<InjectionController> _uriMaker;
+
             [Route("")]
             public ResourceState GetAll()
             {
-                var maker = Request.TryGetUriMakerFor<InjectionController>();
                 var repr = new ResourceState
                 {
-                    self = maker.UriFor(c => c.GetAll()),
-                    next = maker.UriFor(c => c.GetPaged(1, 10)),
-                    first = maker.UriFor(c => c.GetById(0)),
-                    first_alternative = maker.UriFor(c => c.GetById(0, true))
+                    self = _uriMaker.UriFor(c => c.GetAll()),
+                    next = _uriMaker.UriFor(c => c.GetPaged(1, 10)),
+                    first = _uriMaker.UriFor(c => c.GetById(0)),
+                    first_alternative = _uriMaker.UriFor(c => c.GetById(0, true))
                 };
                 return repr;
             }
@@ -74,6 +75,11 @@ namespace Drum.Tests
             public void GetById(int id, bool detailed)
             {
                 throw new NotImplementedException();
+            }
+
+            public InjectionController(UriMaker<InjectionController> uriMaker)
+            {
+                _uriMaker = uriMaker;
             }
         }
     }
