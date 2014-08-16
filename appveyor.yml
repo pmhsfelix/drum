@@ -44,9 +44,6 @@ platform: Any CPU
 # build Configuration, i.e. Debug, Release, etc.
 configuration: Release
 
-build:
-  project: src\drum.sln
-
 # scripts to run before build
 before_build:
 - git submodule init
@@ -54,11 +51,8 @@ before_build:
 - nuget restore src\Drum.sln
 - msbuild vendor\Strathweb.TypedRouting\Strathweb.TypedRouting.sln
 
-# scripts to run after build
-after_build:
-
-# to run your custom scripts instead of automatic MSBuild
-build_script:
+build:
+  project: src\drum.sln
 
 # to disable automatic builds
 #build: off
