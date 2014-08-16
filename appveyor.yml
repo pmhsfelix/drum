@@ -53,6 +53,7 @@ before_build:
 
 build:
   project: src\drum.sln
+  publish_nuget: true
 
 # to disable automatic builds
 #build: off

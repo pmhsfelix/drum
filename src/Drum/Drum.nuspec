@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>drum</title>
+    <authors>Pedro Félix</authors>
+    <owners>Pedro Félix</owners>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
+    <projectUrl>https://github.com/pmhsfelix/drum</projectUrl>    
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>DRUM - Direct Route URI Maker for ASP.NET Web API</description>
+    <releaseNotes>$version$</releaseNotes>
+    <copyright>Copyright 2014</copyright>
+    <tags>"ASP.NET Web API" URI routing</tags>
+  </metadata>
+</package>
