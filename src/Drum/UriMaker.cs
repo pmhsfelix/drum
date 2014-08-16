@@ -40,7 +40,7 @@ namespace Drum
             var route = _mapper(actionMethod);
             if(route == null)
             {
-                throw new Exception("Unable to find route");
+                throw new RouteNotFoundException(actionMethod);
             }
             
             if (methodCall.Arguments.Count == 0)
