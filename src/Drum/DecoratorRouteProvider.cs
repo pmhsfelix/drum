@@ -6,7 +6,7 @@ using System.Web.Http.Routing;
 
 namespace Drum
 {
-    public class DecoratorRouteProvider : IDirectRouteProvider
+    internal class DecoratorRouteProvider : IDirectRouteProvider
     {
         private readonly IDirectRouteProvider _provider;
         private readonly IDictionary<MethodInfo, RouteEntry> _map = new Dictionary<MethodInfo, RouteEntry>(); 
@@ -14,14 +14,14 @@ namespace Drum
         public DecoratorRouteProvider(IDirectRouteProvider provider)
         {
             _provider = provider;
-            Mapper = methodInfo =>
+            RouteMap = methodInfo =>
             {
                 RouteEntry entry;
                 return _map.TryGetValue(methodInfo, out entry) ? entry : null;
             };
         }
 
-        public IReadOnlyList<RouteEntry> GetDirectRoutes(HttpControllerDescriptor controllerDescriptor, IReadOnlyList<HttpActionDescriptor> actionDescriptors,
+        IReadOnlyList<RouteEntry> IDirectRouteProvider.GetDirectRoutes(HttpControllerDescriptor controllerDescriptor, IReadOnlyList<HttpActionDescriptor> actionDescriptors,
             IInlineConstraintResolver constraintResolver)
         {
             var routes = _provider.GetDirectRoutes(controllerDescriptor, actionDescriptors, constraintResolver);
@@ -35,22 +35,26 @@ namespace Drum
                 {
                     continue;
                 }
-                if (descs.Length > 1)
+                foreach (var desc in descs)
                 {
-                    throw new Exception("more than one action on the same route is not supported");   
+                    var reflDesc = desc as ReflectedHttpActionDescriptor;
+                    if (reflDesc == null)
+                    {
+                        continue;
+                    }
+                    var method = reflDesc.MethodInfo;
+                    RouteEntry prevEntry;
+                    if (_map.TryGetValue(method, out prevEntry))
+                    {
+                        throw new MultipleRoutesForSameMethodException(reflDesc, prevEntry, newRoute);
+                    }
+                    _map.Add(method, newRoute);
                 }
-                var desc = descs[0] as ReflectedHttpActionDescriptor;
-                if (desc == null)
-                {
-                    continue;
-                }
-                
-                _map.Add(desc.MethodInfo, newRoute);
             }
             return list;
         }
 
-        public Func<MethodInfo, RouteEntry> Mapper
+        public Func<MethodInfo, RouteEntry> RouteMap
         {
             get; private set;
         }

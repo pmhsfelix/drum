@@ -55,9 +55,12 @@
     <Compile Include="HttpConfigurationExtensions.cs" />
     <Compile Include="HttpRequestExtensions.cs" />
     <Compile Include="HttpRouteExtensions.cs" />
+    <Compile Include="MultipleRoutesForSameMethodException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SomethingInjectionHandler.cs" />
+    <Compile Include="UriMakerRequestFlowHandler.cs" />
+    <Compile Include="UnsupportedException.cs" />
     <Compile Include="UriMaker.cs" />
+    <Compile Include="UriMakerContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

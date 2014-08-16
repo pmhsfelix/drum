@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http;
 using System.Reflection;
-using System.Web.Http;
 using System.Web.Http.Routing;
 
 namespace Drum
@@ -15,7 +14,7 @@ namespace Drum
 
         private static readonly MethodInfo DictionaryAddMethod = typeof(Dictionary<string, object>).GetMethod(
             "Add",
-            new Type[] { typeof(string), typeof(object) });
+            new [] { typeof(string), typeof(object) });
 
         private readonly Func<MethodInfo, RouteEntry> _mapper;
 
@@ -31,7 +30,7 @@ namespace Drum
             var methodCall = action.Body as MethodCallExpression;
             if (methodCall == null)
             {
-                throw new ArgumentException("The expression must be a method call.", "method");
+                throw new ArgumentException("The expression must be a method call.");
             }
 
             var actionMethod = methodCall.Method;
@@ -85,30 +84,8 @@ namespace Drum
             _uriMaker = new UriMaker(mapper, urlHelper);
         }
 
-        public UriMaker(UriMakerFactory fact, HttpRequestMessage req)
-            : this(fact.Mapper, new UrlHelper(req))
+        public UriMaker(UriMakerContext fact, HttpRequestMessage req)
+            : this(fact.RouteMap, new UrlHelper(req))
         {}
-    }
-
-    public class UriMakerFactory
-    {
-        private readonly Func<MethodInfo, RouteEntry> _mapper;
-
-        public Func<MethodInfo, RouteEntry> Mapper { get { return _mapper; } }
-
-        public UriMakerFactory(Func<MethodInfo,RouteEntry> mapper)
-        {
-            _mapper = mapper;
-        }
-
-        public UriMaker<TController> NewUriMakerFor<TController>(UrlHelper urlHelper)
-        {
-            return new UriMaker<TController>(_mapper, urlHelper);
-        }
-
-        public UriMaker<TController> NewUriMakerFor<TController>(HttpRequestMessage request)
-        {
-            return new UriMaker<TController>(_mapper, new UrlHelper(request));
-        }
     }
 }

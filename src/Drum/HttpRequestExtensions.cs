@@ -1,5 +1,4 @@
 ﻿using System.Net.Http;
-using System.Web.Http.Routing;
 
 namespace Drum
 {
@@ -7,7 +6,7 @@ namespace Drum
     {
         public static UriMaker<T> TryGetUriMakerFor<T>(this HttpRequestMessage req)
         {
-            var factory =  SomethingInjectionHandler.TryGetUriMakerFactory(req);
+            var factory =  UriMakerRequestFlowHandler.TryGetUriMakerFactory(req);
             return factory != null ? factory.NewUriMakerFor<T>(req) : null;
         }
     }
