@@ -12,6 +12,6 @@
     <description>DRUM - Direct Route URI Maker for ASP.NET Web API</description>
     <releaseNotes>$version$</releaseNotes>
     <copyright>Copyright 2014</copyright>
-    <tags>"ASP.NET Web API" URI routing</tags>
+    <tags>ASP.NET Web API URI routing</tags>
   </metadata>
 </package>
