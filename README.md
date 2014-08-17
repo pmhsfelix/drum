@@ -28,6 +28,7 @@ public class ResourceController : ApiController
 
     ...
 }
+```
 
 The idea of using lambda expressions to generated URIs is not a new one.
 
@@ -96,3 +97,6 @@ builder.RegisterInstance(uriMakerContext).ExternallyOwned();
 builder.RegisterHttpRequestMessage(config);
 builder.RegisterGeneric(typeof(UriMaker<>)).AsSelf().InstancePerRequest();
 ```
+## Nuget
+
+Drum is available as a nuget package at: [https://www.nuget.org/packages/Drum/](https://www.nuget.org/packages/Drum/)
