@@ -18,7 +18,7 @@ namespace Drum.Tests
             [Route("")]
             public void GetAll() { }
 
-            [Route("")]
+            [Route("", Name="GetPaged")]
             public void GetPaged(int page, int count) { }
 
             [Route("{id}")]
@@ -38,8 +38,14 @@ namespace Drum.Tests
         [Fact]
         public void Can_make_uri_for_action_with_multiple_prms()
         {
-            var uri = _uriMaker.UriFor(c => c.GetPaged(0, 10));
-            Assert.Equal("http://example.org/api/UriMakerTests/resources?page=0&count=10", uri.ToString());
+            // using UrlHelper 
+            var uri1 = _urlHelper.Link("GetPaged", new { page = 0, count = 10 });
+
+            // using UriMaker
+            var uri2 = _uriMaker.UriFor(c => c.GetPaged(0, 10));
+            
+            Assert.Equal(uri1,uri2.ToString());
+            Assert.Equal("http://example.org/api/UriMakerTests/resources?page=0&count=10", uri2.ToString());
         }
 
         [Fact]
@@ -63,9 +69,11 @@ namespace Drum.Tests
             config.EnsureInitialized();
             var req = new HttpRequestMessage(HttpMethod.Get,"http://example.org");
             req.SetConfiguration(config);
+            _urlHelper = new UrlHelper(req);
             _uriMaker = factory.NewUriMakerFor<ResourceController>(req);
         }
 
         private readonly UriMaker<ResourceController> _uriMaker;
+        private UrlHelper _urlHelper;
     }
 }

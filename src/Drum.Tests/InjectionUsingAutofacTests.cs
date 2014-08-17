@@ -21,8 +21,8 @@ namespace Drum.Tests
             builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
 
             // Web API routes
-            var factory = config.MapHttpAttributeRoutesAndUseUriMaker();
-            builder.RegisterInstance(factory).ExternallyOwned();
+            var uriMakerContext = config.MapHttpAttributeRoutesAndUseUriMaker();
+            builder.RegisterInstance(uriMakerContext).ExternallyOwned();
             builder.RegisterHttpRequestMessage(config);
             builder.RegisterGeneric(typeof(UriMaker<>)).AsSelf().InstancePerRequest();
 
