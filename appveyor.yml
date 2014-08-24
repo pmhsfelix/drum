@@ -4,7 +4,7 @@
 #---------------------------------#
 
 # version format
-version: 0.1.0-beta{build}
+version: 0.2.0-beta{build}
 
 #---------------------------------#
 #    environment configuration    #
@@ -20,9 +20,9 @@ clone_folder: c:\projects\drum
 assembly_info:
   patch: true
   file: AssemblyInfo.*
-  assembly_version: "0.1.0"
-  assembly_file_version: "0.1.0"
-  assembly_informational_version: "0.1.0"
+  assembly_version: "0.2.0"
+  assembly_file_version: "0.2.0"
+  assembly_informational_version: "{version}"
 
 #---------------------------------#
 #       build configuration       #
