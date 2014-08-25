@@ -58,7 +58,6 @@
     <Compile Include="MultipleRoutesForSameMethodException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RouteNotFoundException.cs" />
-    <Compile Include="UriMakerRequestFlowHandler.cs" />
     <Compile Include="UnsupportedException.cs" />
     <Compile Include="UriMaker.cs" />
     <Compile Include="UriMakerContext.cs" />
