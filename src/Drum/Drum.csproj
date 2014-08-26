@@ -56,6 +56,7 @@
     <Compile Include="HttpRequestExtensions.cs" />
     <Compile Include="HttpRouteExtensions.cs" />
     <Compile Include="MultipleRoutesForSameMethodException.cs" />
+    <Compile Include="Param.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RouteNotFoundException.cs" />
     <Compile Include="UnsupportedException.cs" />
