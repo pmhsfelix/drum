@@ -52,7 +52,15 @@ Drum also works with unnamed routes.
 By default, attribute-based direct routes are enabled by calling the [`MapHttpAttributeRoutes`](http://msdn.microsoft.com/en-us/library/dn479134(v=vs.118).aspx) extension method over the HttpConfiguration.
 To use Drum, use the  `MapHttpAttributeRoutesAndUseUriMaker` method intead.
 
-If using an custom direct route mechanism, such as `Strathweb.TypedRouting`, just pass the custom `IDirectRouteProvider` as a parameter to the `MapHttpAttributeRoutesAndUseUriMaker` method (see [https://github.com/pmhsfelix/drum/blob/master/src/Drum.Tests/StrathWebTypedRouteTests.cs](https://github.com/pmhsfelix/drum/blob/master/src/Drum.Tests/StrathWebTypedRouteTests.cs) for an example).
+```csharp
+config.MapHttpAttributeRoutesAndUseUriMaker();
+```
+
+If using a custom direct route mechanism, such as `Strathweb.TypedRouting`, just pass the custom `IDirectRouteProvider` as a parameter to the `MapHttpAttributeRoutesAndUseUriMaker` method (see [https://github.com/pmhsfelix/drum/blob/master/src/Drum.Tests/StrathWebTypedRouteTests.cs](https://github.com/pmhsfelix/drum/blob/master/src/Drum.Tests/StrathWebTypedRouteTests.cs) for an example).
+
+```csharp
+config.MapHttpAttributeRoutesAndUseUriMaker(new TypedDirectRouteProvider());
+```
 
 ### `UriMaker` 
 The Drum library  provides an `UriMaker<TController>` class, containing the `UriFor` method.
@@ -66,14 +74,7 @@ This method receives an `Expression<Action<TController>>` and returns an URI poi
 
 #### Creating `UriMaker` from the current request
 
-Get the `UriMakerContext` instance returned by `MapHttpAttributeRoutesAndUseUriMaker` and pass it to the `FlowUriMakerContextOnRequests` extension method.
-
-```csharp
-var drumContext = config.MapHttpAttributeRoutesAndUseUriMaker(new TypedDirectRouteProvider());
-config.FlowUriMakerContextOnRequests(drumContext);
-```
-This way, the routing information required by `UriMaker` will be available on every request.
-Then, when needed, use the `TryGetUriMakerFor<TController>` to obtain a `UriMaker<TController>` instance, for instance inside a controller.
+When you register Drum by calling the `MapHttpAttributeRoutesAndUseUriMaker` method, `UriMakerContext` instance is stored in the `Properties` of the `HttpConfiguration` and available for every incoming HTTP request. When needed, use the `TryGetUriMakerFor<TController>` to obtain a `UriMaker<TController>` instance, for instance inside a controller.
 
 ```csharp
 var uriMaker = Request.TryGetUriMakerFor<TypedRoutesController>();

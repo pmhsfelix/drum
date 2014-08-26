@@ -8,6 +8,11 @@ using System.Web.Http.Routing;
 
 namespace Drum.Example.Controllers
 {
+    public class ResourceDto
+    {
+        public string Text { get; set; }
+    }
+
     [RoutePrefix("api/resources")]
     public class ResourcesController : ApiController
     {
@@ -20,7 +25,9 @@ namespace Drum.Example.Controllers
                 self = maker.UriFor(c => c.GetAll()),
                 next = maker.UriFor(c => c.GetPaged(1, 10)),
                 first = maker.UriFor(c => c.GetById(0)),
-                first_alternative = maker.UriFor(c => c.GetById(0,true))
+                first_alternative = maker.UriFor(c => c.GetById(0,true)),
+                add = maker.UriFor(c => c.Post(Param<ResourceDto>.Any)),
+                edit = maker.UriFor(c => c.Put(0, Param<ResourceDto>.Any))
             };
         }
 
@@ -41,6 +48,16 @@ namespace Drum.Example.Controllers
         {
             throw new NotImplementedException();
         }
+
+        [Route("")]
+        public void Post(ResourceDto dto)
+        {
+        }
+
+        [Route("{id}")]
+        public void Put(int id, ResourceDto dto)
+        {
+        }
     }
 
     public class ResourceState
@@ -49,5 +66,7 @@ namespace Drum.Example.Controllers
         public Uri next { get; set; }
         public Uri first { get; set; }
         public Uri first_alternative { get; set; }
+        public Uri add { get; set; }
+        public Uri edit { get; set; }
     }
 }
