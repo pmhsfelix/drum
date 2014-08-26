@@ -26,8 +26,8 @@ namespace Drum.Example.Controllers
                 next = maker.UriFor(c => c.GetPaged(1, 10)),
                 first = maker.UriFor(c => c.GetById(0)),
                 first_alternative = maker.UriFor(c => c.GetById(0,true)),
-                add = maker.UriFor(c => c.Post(Param.Any<ResourceDto>())),
-                edit = maker.UriFor(c => c.Put(0, Param.Any<ResourceDto>()))
+                add = maker.UriFor(c => c.Post(Param<ResourceDto>.Any)),
+                edit = maker.UriFor(c => c.Put(0, Param<ResourceDto>.Any))
             };
         }
 

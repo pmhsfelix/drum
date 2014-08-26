@@ -1,10 +1,10 @@
 ﻿namespace Drum
 {
-    public static class Param
+    public static class Param<TValue>
     {
-        public static TValue Any<TValue>()
+        public static TValue Any
         {
-            return default(TValue);
+            get { return default(TValue); }
         }
     }
 }
