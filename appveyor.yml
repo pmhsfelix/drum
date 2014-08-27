@@ -22,7 +22,7 @@ assembly_info:
   file: AssemblyInfo.*
   assembly_version: "0.2.0"
   assembly_file_version: "0.2.0"
-  assembly_informational_version: "{version}"
+  assembly_informational_version: "0.2.0"
 
 #---------------------------------#
 #       build configuration       #
