@@ -7,11 +7,11 @@ namespace Drum
 {
     public class UriMakerContext
     {
-        private readonly Func<MethodInfo, RouteEntry> _routeMap;
+        private readonly Func<MethodInfo, MethodHandler> _routeMap;
 
-        public Func<MethodInfo, RouteEntry> RouteMap { get { return _routeMap; } }
+        public Func<MethodInfo, MethodHandler> RouteMap { get { return _routeMap; } }
 
-        public UriMakerContext(Func<MethodInfo,RouteEntry> routeMap)
+        public UriMakerContext(Func<MethodInfo, MethodHandler> routeMap)
         {
             _routeMap = routeMap;
         }

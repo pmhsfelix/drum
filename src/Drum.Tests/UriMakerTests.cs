@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -10,6 +12,13 @@ using Xunit;
 
 namespace Drum.Tests
 {
+    [FromUri]
+    public class PageInfo
+    {
+        public int page { get; set; }
+        public int count { get; set; }
+    }
+
     public class UriMakerTests
     {
         [RoutePrefix("api/UriMakerTests/resources")]
@@ -20,6 +29,9 @@ namespace Drum.Tests
 
             [Route("", Name="GetPaged")]
             public void GetPaged(int page, int count) { }
+
+            [Route("")]
+            public void GetPaged(PageInfo page, bool detailed) { }
 
             [Route("{id}")]
             public void GetById(int id) { }
@@ -60,6 +72,13 @@ namespace Drum.Tests
         {
             var uri = _uriMaker.UriFor(c => c.GetById(123, true));
             Assert.Equal("http://example.org/api/UriMakerTests/resources/123?detailed=True", uri.ToString());
+        }
+
+        [Fact]
+        public void Can_make_uri_for_action_with_complex_uri_parameters()
+        {
+            var uri = _uriMaker.UriFor(c => c.GetPaged(new PageInfo{page = 2,count = 10}, true));
+            Assert.Equal("http://example.org/api/UriMakerTests/resources?page=2&count=10&detailed=True", uri.ToString());
         }
         
         public UriMakerTests()

@@ -1,22 +1,134 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
+using System.Web.Http;
 using System.Web.Http.Controllers;
+using System.Web.Http.ModelBinding;
 using System.Web.Http.Routing;
 
 namespace Drum
 {
+    public class MethodHandler
+    {
+        public MethodHandler(MethodInfo method, RouteEntry newRoute)
+        {
+            RouteEntry = newRoute;
+            ParameterHandlers = method.GetParameters().Select(p => new ParameterHandler(p)).ToList();
+        }
+
+        public RouteEntry RouteEntry { get; private set; }
+        public IReadOnlyCollection<ParameterHandler> ParameterHandlers { get; private set; }
+
+        public Uri MakeUriFor(ReadOnlyCollection<Expression> arguments, UrlHelper urlHelper)
+        {
+            return (ParameterHandlers.Any())
+                ? new Uri(
+                    urlHelper.Link(
+                        RouteEntry.Name,
+                        ComputeRouteMap(ComputeArgumentValues(arguments))))
+                : new Uri(urlHelper.Link(RouteEntry.Name, new {}));
+
+        }
+
+        private IDictionary<string,object> ComputeRouteMap(object[] argValues)
+        {
+            return ParameterHandlers
+                .Where(ph => ph.IsFromUri)
+                .SelectMany((ph, i) => ph.GetRouteValues.Select(rv => new
+                {
+                    Name = rv.Name,
+                    Getter = new Func<object,object>(rv.GetFromArgumentValue),
+                    Object = argValues[i]
+                }))
+                .ToDictionary(_ => _.Name, _ => _.Getter(_.Object));
+        }
+
+        private object[] ComputeArgumentValues(IEnumerable<Expression> arguments)
+        {
+            return Expression.Lambda<Func<object[]>>
+                (
+                    Expression.NewArrayInit(
+                        typeof (object),
+                        Enumerable.Zip(ParameterHandlers, arguments, (ph, a) => new
+                        {
+                            ParameterHandler = ph,
+                            Argument = a
+                        })
+                            .Where(_ => _.ParameterHandler.IsFromUri)
+                            .Select(_ => Expression.Convert(_.Argument, typeof (object))))
+                )
+                .Compile()();
+        }
+    }
+
+    public class ParameterHandler
+    {
+        public ParameterHandler(ParameterInfo parameterInfo)
+        {
+            if (IsSimpleType(parameterInfo.ParameterType))
+            {
+                GetRouteValues =
+                    new ReadOnlyCollection<RouteValueHandler>(new List<RouteValueHandler>()
+                    {
+                        new RouteValueHandler(parameterInfo.Name, v => v)
+                    });
+            }
+            else
+            {
+                var type = parameterInfo.ParameterType;
+                var typeDesc = new AssociatedMetadataTypeTypeDescriptionProvider(type).GetTypeDescriptor(type);
+                var propDescs = typeDesc.GetProperties();
+                GetRouteValues = propDescs.OfType<PropertyDescriptor>()
+                    .Select(desc => new RouteValueHandler(desc.Name, desc.GetValue)).ToList();
+            }
+
+            IsFromUri = true;
+        }
+
+        private bool IsSimpleType(Type parameterType)
+        {
+            return TypeDescriptor.GetConverter(parameterType).CanConvertFrom(typeof(string));
+        }
+
+        public bool IsFromUri { get; private set; }
+
+        public IReadOnlyCollection<RouteValueHandler> GetRouteValues { get; private set; }
+        
+    }
+
+    public class RouteValueHandler
+    {
+        private readonly Func<object, object> _getter;
+        public string Name { get; private set; }
+
+        public object GetFromArgumentValue(object argument)
+        {
+            return _getter(argument);
+        }
+
+        public RouteValueHandler(string name, Func<object,object> getter)
+        {
+            _getter = getter;
+            Name = name;
+        }
+    }
+
     internal class DecoratorRouteProvider : IDirectRouteProvider
     {
         private readonly IDirectRouteProvider _provider;
-        private readonly IDictionary<MethodInfo, RouteEntry> _map = new Dictionary<MethodInfo, RouteEntry>(); 
+        private readonly IDictionary<MethodInfo, MethodHandler> _map = new Dictionary<MethodInfo, MethodHandler>(); 
 
         public DecoratorRouteProvider(IDirectRouteProvider provider)
         {
             _provider = provider;
             RouteMap = methodInfo =>
             {
-                RouteEntry entry;
+                MethodHandler entry;
                 return _map.TryGetValue(methodInfo, out entry) ? entry : null;
             };
         }
@@ -43,18 +155,18 @@ namespace Drum
                         continue;
                     }
                     var method = reflDesc.MethodInfo;
-                    RouteEntry prevEntry;
+                    MethodHandler prevEntry;
                     if (_map.TryGetValue(method, out prevEntry))
                     {
-                        throw new MultipleRoutesForSameMethodException(reflDesc, prevEntry, newRoute);
+                        throw new MultipleRoutesForSameMethodException(reflDesc, prevEntry.RouteEntry, newRoute);
                     }
-                    _map.Add(method, newRoute);
+                    _map.Add(method, new MethodHandler(method, newRoute));
                 }
             }
             return list;
         }
 
-        public Func<MethodInfo, RouteEntry> RouteMap
+        public Func<MethodInfo, MethodHandler> RouteMap
         {
             get; private set;
         }

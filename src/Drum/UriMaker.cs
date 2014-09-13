@@ -12,14 +12,9 @@ namespace Drum
     {
         private readonly UrlHelper _urlHelper;
 
-        private static readonly MethodInfo DictionaryAddMethod = typeof(Dictionary<string, object>).GetMethod(
-            "Add",
-            new [] { typeof(string), typeof(object) });
+        private readonly Func<MethodInfo, MethodHandler> _mapper;
 
-        private readonly Func<MethodInfo, RouteEntry> _mapper;
-
-
-        public UriMaker(Func<MethodInfo, RouteEntry> mapper, UrlHelper urlHelper)
+        public UriMaker(Func<MethodInfo, MethodHandler> mapper, UrlHelper urlHelper)
         {
             _urlHelper = urlHelper;
             _mapper = mapper;
@@ -34,39 +29,18 @@ namespace Drum
             }
 
             var actionMethod = methodCall.Method;
-            var actionParameters = actionMethod.GetParameters();
-
-            // Get the route
-            var route = _mapper(actionMethod);
-            if(route == null)
+            
+            var methodHandler = _mapper(actionMethod);
+            if(methodHandler == null)
             {
                 throw new RouteNotFoundException(actionMethod);
             }
-            
-            if (methodCall.Arguments.Count == 0)
-            {
-                return new Uri(_urlHelper.Link(route.Name, new { }));
-            }
 
-            // Build an expression that creates a dictionary with the following structure:
-            //
-            // { <actionParamaterName>, <actionParameterValue> }
-            var routeValuesExpr = Expression.Lambda<Func<Dictionary<string, object>>>
-                (
-                    Expression.ListInit(
-                        Expression.New(typeof(Dictionary<string, object>)),
-                        methodCall.Arguments.Select((a, i) => Expression.ElementInit(
-                            DictionaryAddMethod,
-                            Expression.Constant(actionParameters[i].Name),
-                            Expression.Convert(a, typeof(object))))
-                        )
-                );
+            return methodHandler.MakeUriFor(methodCall.Arguments, _urlHelper);
 
-            // Compile and evaluate the expressions
-            var routeValuesGetter = routeValuesExpr.Compile();
-            var routeValues = routeValuesGetter();
-
-            return new Uri(_urlHelper.Link(route.Name, routeValues));
+            return methodCall.Arguments.Count == 0 ? 
+                new Uri(_urlHelper.Link(methodHandler.RouteEntry.Name, new { })) 
+                : methodHandler.MakeUriFor(methodCall.Arguments, _urlHelper);
         }
     }
 
@@ -79,7 +53,7 @@ namespace Drum
             return _uriMaker.UriFor(action);
         }
 
-        public UriMaker(Func<MethodInfo,RouteEntry> mapper, UrlHelper urlHelper)
+        public UriMaker(Func<MethodInfo, MethodHandler> mapper, UrlHelper urlHelper)
         {
             _uriMaker = new UriMaker(mapper, urlHelper);
         }
