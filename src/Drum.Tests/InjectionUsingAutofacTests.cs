@@ -42,9 +42,9 @@ namespace Drum.Tests
         }
 
         [RoutePrefix("api/autofac/resources")]
-        public class InjectionController : ApiController
+        public class AutofacInjectionController : ApiController
         {
-            private readonly UriMaker<InjectionController> _uriMaker;
+            private readonly UriMaker<AutofacInjectionController> _uriMaker;
 
             [Route("")]
             public ResourceState GetAll()
@@ -77,7 +77,7 @@ namespace Drum.Tests
                 throw new NotImplementedException();
             }
 
-            public InjectionController(UriMaker<InjectionController> uriMaker)
+            public AutofacInjectionController(UriMaker<AutofacInjectionController> uriMaker)
             {
                 _uriMaker = uriMaker;
             }

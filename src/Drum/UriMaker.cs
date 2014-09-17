@@ -37,10 +37,6 @@ namespace Drum
             }
 
             return methodHandler.MakeUriFor(methodCall.Arguments, _urlHelper);
-
-            return methodCall.Arguments.Count == 0 ? 
-                new Uri(_urlHelper.Link(methodHandler.RouteEntry.Name, new { })) 
-                : methodHandler.MakeUriFor(methodCall.Arguments, _urlHelper);
         }
     }
 
