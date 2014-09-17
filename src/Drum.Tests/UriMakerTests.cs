@@ -25,7 +25,10 @@ namespace Drum.Tests
         public class ResourceController : ApiController
         {
             [Route("")]
-            public void GetAll() { }
+            public Task<HttpResponseMessage> GetAll()
+            {
+                return null;
+            }
 
             [Route("", Name="GetPaged")]
             public void GetPaged(int page, int count) { }
