@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Routing;
@@ -25,8 +19,9 @@ namespace Drum.Tests
         public class ResourceController : ApiController
         {
             [Route("")]
-            public Task<HttpResponseMessage> GetAll()
+            public async Task<HttpResponseMessage> GetAll()
             {
+                await Task.Delay(0);
                 return null;
             }
 
@@ -44,8 +39,9 @@ namespace Drum.Tests
         }
         
         [Fact]
-        public void Can_make_uri_for_action_without_prms()
+        public async Task Can_make_uri_for_action_without_prms()
         {
+            await Task.Delay(0);
             var uri = _uriMaker.UriFor(c => c.GetAll());
             Assert.Equal("http://example.org/api/UriMakerTests/resources", uri.ToString());
         }

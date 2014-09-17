@@ -20,9 +20,19 @@ namespace Drum
             _mapper = mapper;
         }
 
+        public Uri UriFor<T>(Expression<Func<T,object>> action)
+        {
+            return CoreUriFor(action.Body);
+        }
+
         public Uri UriFor<T>(Expression<Action<T>> action)
         {
-            var methodCall = action.Body as MethodCallExpression;
+            return CoreUriFor(action.Body);
+        }
+
+        private Uri CoreUriFor(Expression expr)
+        {
+            var methodCall = expr as MethodCallExpression;
             if (methodCall == null)
             {
                 throw new ArgumentException("The expression must be a method call.");
@@ -45,6 +55,11 @@ namespace Drum
         private readonly UriMaker _uriMaker;
 
         public Uri UriFor(Expression<Action<TController>> action)
+        {
+            return _uriMaker.UriFor(action);
+        }
+
+        public Uri UriFor(Expression<Func<TController, object>> action)
         {
             return _uriMaker.UriFor(action);
         }
