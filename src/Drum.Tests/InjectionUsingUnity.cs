@@ -62,12 +62,12 @@ namespace Drum.Tests
 
         public class CurrentRequestHandler : DelegatingHandler
         {
-            protected async override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
             {
                 var scope = request.GetDependencyScope();
                 var currentRequest = (CurrentRequest)scope.GetService(typeof(CurrentRequest));
                 currentRequest.Value = request;
-                return await base.SendAsync(request, cancellationToken);
+                return base.SendAsync(request, cancellationToken);
             }
         }
 
