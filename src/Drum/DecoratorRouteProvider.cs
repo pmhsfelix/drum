@@ -35,6 +35,11 @@ namespace Drum
 
         }
 
+        public IDictionary<string, object> GetRouteMapFor(ReadOnlyCollection<Expression> arguments)
+        {
+            return ComputeRouteMap(ComputeArgumentValues(arguments));
+        }
+
         private IDictionary<string,object> ComputeRouteMap(object[] argValues)
         {
             return ParameterHandlers
