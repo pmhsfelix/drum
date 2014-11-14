@@ -16,13 +16,6 @@ os: Windows Server 2012
 # clone directory
 clone_folder: c:\projects\drum
 
-# enable patching of AssemblyInfo.* files
-assembly_info:
-  patch: true
-  file: AssemblyInfo.*
-  assembly_version: "0.3.0"
-  assembly_file_version: "0.3.0"
-  assembly_informational_version: "0.3.0"
 
 #---------------------------------#
 #       build configuration       #
