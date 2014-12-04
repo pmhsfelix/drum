@@ -9,9 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Drum.Tests", "Drum.Tests\Dr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Drum.Example", "Drum.Example\Drum.Example.csproj", "{6319CE82-A460-4103-BF9D-BE0F90A415F9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Drum.Hyprlinkr", "Drum.Hyprlinkr\Drum.Hyprlinkr.csproj", "{4541423F-307A-4E1C-A60F-7E5F9076FBBD}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Drum.Hyprlinkr.Tests", "Drum.Hyprlinkr.Tests\Drum.Hyprlinkr.Tests.csproj", "{DCBD7BF8-C0B6-4118-B8D9-EB4A3522B302}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{0D6D841F-BA67-46FD-AA42-6C282BD4CBF3}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\packages.config = .nuget\packages.config
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,14 +32,6 @@ Global
 		{6319CE82-A460-4103-BF9D-BE0F90A415F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6319CE82-A460-4103-BF9D-BE0F90A415F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6319CE82-A460-4103-BF9D-BE0F90A415F9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4541423F-307A-4E1C-A60F-7E5F9076FBBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4541423F-307A-4E1C-A60F-7E5F9076FBBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4541423F-307A-4E1C-A60F-7E5F9076FBBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4541423F-307A-4E1C-A60F-7E5F9076FBBD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DCBD7BF8-C0B6-4118-B8D9-EB4A3522B302}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DCBD7BF8-C0B6-4118-B8D9-EB4A3522B302}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DCBD7BF8-C0B6-4118-B8D9-EB4A3522B302}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DCBD7BF8-C0B6-4118-B8D9-EB4A3522B302}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
