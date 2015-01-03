@@ -78,6 +78,7 @@
     <Compile Include="InjectionUsingAutofacTests.cs" />
     <Compile Include="MultipleRouteTests.cs" />
     <Compile Include="ResourceState.cs" />
+    <Compile Include="RouteDataPropagationTests.cs" />
     <Compile Include="StrathWebTypedRouteTests.cs" />
     <Compile Include="UriMakerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

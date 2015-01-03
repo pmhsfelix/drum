@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
@@ -19,21 +20,34 @@ namespace Drum
         public MethodHandler(MethodInfo method, RouteEntry newRoute, Func<HttpRequestMessage, ICollection<RouteEntry>, RouteEntry> routeSelector)
         {
             _routeSelector = routeSelector ?? ((req, coll) => coll.First());
-            RouteEntries = new Collection<RouteEntry> {newRoute};
+            RouteEntries = new Collection<RouteEntry> { newRoute };
             ParameterHandlers = method.GetParameters().Select(p => new ParameterHandler(p)).ToList();
         }
 
         public ICollection<RouteEntry> RouteEntries { get; private set; }
         public IReadOnlyCollection<ParameterHandler> ParameterHandlers { get; private set; }
 
-        private static readonly IDictionary<string,object> EmptyMap = new Dictionary<string, object>();
+        private static readonly IDictionary<string, object> EmptyMap = new Dictionary<string, object>();
         private readonly Func<HttpRequestMessage, ICollection<RouteEntry>, RouteEntry> _routeSelector;
 
         public Uri MakeUriFor(ReadOnlyCollection<Expression> arguments, UrlHelper urlHelper)
         {
             var argumentValues = ParameterHandlers.Any() ? ComputeRouteMap(ComputeArgumentValues(arguments)) : EmptyMap;
+            var map = new Dictionary<string, object>();
+            if (urlHelper.Request.GetRouteData() != null && urlHelper.Request.GetRouteData().GetSubRoutes() != null)
+            {
+                foreach (var p in urlHelper.Request.GetRouteData().GetSubRoutes().SelectMany(r => r.Values))
+                {
+                    map[p.Key] = p.Value;
+                }
+            }
+            foreach (var p in argumentValues)
+            {
+                map[p.Key] = p.Value;
+            }
+
             var routeEntry = _routeSelector(urlHelper.Request, RouteEntries);
-            return new Uri(urlHelper.Link(routeEntry.Name, argumentValues));
+            return new Uri(urlHelper.Link(routeEntry.Name, map));
         }
 
         public IDictionary<string, object> GetRouteMapFor(ReadOnlyCollection<Expression> arguments)
@@ -41,14 +55,14 @@ namespace Drum
             return ComputeRouteMap(ComputeArgumentValues(arguments));
         }
 
-        private IDictionary<string,object> ComputeRouteMap(object[] argValues)
+        private IDictionary<string, object> ComputeRouteMap(object[] argValues)
         {
             return ParameterHandlers
                 .Where(ph => ph.IsFromUri)
                 .SelectMany((ph, i) => ph.GetRouteValues.Select(rv => new
                 {
                     Name = rv.Name,
-                    Getter = new Func<object,object>(rv.GetFromArgumentValue),
+                    Getter = new Func<object, object>(rv.GetFromArgumentValue),
                     Object = argValues[i]
                 }))
                 .ToDictionary(_ => _.Name, _ => _.Getter(_.Object));
@@ -59,14 +73,14 @@ namespace Drum
             return Expression.Lambda<Func<object[]>>
                 (
                     Expression.NewArrayInit(
-                        typeof (object),
+                        typeof(object),
                         Enumerable.Zip(ParameterHandlers, arguments, (ph, a) => new
                         {
                             ParameterHandler = ph,
                             Argument = a
                         })
                             .Where(_ => _.ParameterHandler.IsFromUri)
-                            .Select(_ => Expression.Convert(_.Argument, typeof (object))))
+                            .Select(_ => Expression.Convert(_.Argument, typeof(object))))
                 )
                 .Compile()();
         }
@@ -104,7 +118,7 @@ namespace Drum
         public bool IsFromUri { get; private set; }
 
         public IReadOnlyCollection<RouteValueHandler> GetRouteValues { get; private set; }
-        
+
     }
 
     public class RouteValueHandler
@@ -117,7 +131,7 @@ namespace Drum
             return _getter(argument);
         }
 
-        public RouteValueHandler(string name, Func<object,object> getter)
+        public RouteValueHandler(string name, Func<object, object> getter)
         {
             _getter = getter;
             Name = name;
@@ -128,7 +142,7 @@ namespace Drum
     {
         private readonly IDirectRouteProvider _provider;
         private readonly Func<HttpRequestMessage, ICollection<RouteEntry>, RouteEntry> _routeSelector;
-        private readonly IDictionary<MethodInfo, MethodHandler> _map = new Dictionary<MethodInfo, MethodHandler>(); 
+        private readonly IDictionary<MethodInfo, MethodHandler> _map = new Dictionary<MethodInfo, MethodHandler>();
 
         public DecoratorRouteProvider(IDirectRouteProvider provider, Func<HttpRequestMessage, ICollection<RouteEntry>, RouteEntry> routeSelector = null)
         {
@@ -180,7 +194,8 @@ namespace Drum
 
         public Func<MethodInfo, MethodHandler> RouteMap
         {
-            get; private set;
+            get;
+            private set;
         }
     }
 }
