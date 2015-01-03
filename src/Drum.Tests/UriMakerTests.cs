@@ -92,6 +92,6 @@ namespace Drum.Tests
         }
 
         private readonly UriMaker<ResourceController> _uriMaker;
-        private UrlHelper _urlHelper;
+        private readonly UrlHelper _urlHelper;
     }
 }

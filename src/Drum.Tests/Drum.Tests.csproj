@@ -76,6 +76,7 @@
   <ItemGroup>
     <Compile Include="InjectionUsingUnity.cs" />
     <Compile Include="InjectionUsingAutofacTests.cs" />
+    <Compile Include="MultipleRouteTests.cs" />
     <Compile Include="ResourceState.cs" />
     <Compile Include="StrathWebTypedRouteTests.cs" />
     <Compile Include="UriMakerTests.cs" />

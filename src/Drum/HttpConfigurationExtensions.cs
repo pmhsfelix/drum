@@ -1,4 +1,7 @@
-﻿using System.Runtime.Remoting.Contexts;
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Runtime.Remoting.Contexts;
 using System.Web.Http;
 using System.Web.Http.Routing;
 
@@ -10,10 +13,11 @@ namespace Drum
 
         public static UriMakerContext MapHttpAttributeRoutesAndUseUriMaker(
             this HttpConfiguration configuration,
-            IDirectRouteProvider directRouteProvider = null)
+            IDirectRouteProvider directRouteProvider = null,
+            Func<HttpRequestMessage, ICollection<RouteEntry>, RouteEntry> routeSelector = null)
         {
             directRouteProvider = directRouteProvider ?? new DefaultDirectRouteProvider();
-            var decorator = new DecoratorRouteProvider(directRouteProvider);
+            var decorator = new DecoratorRouteProvider(directRouteProvider, routeSelector);
             configuration.MapHttpAttributeRoutes(decorator);
             var uriMakerContext = new UriMakerContext(decorator.RouteMap);
             configuration.Properties.AddOrUpdate(ContextKey, _ => uriMakerContext, (_, __) => uriMakerContext);

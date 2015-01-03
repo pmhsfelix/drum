@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net.Http;
 using System.Reflection;
 using System.Web.Http;
 using System.Web.Http.Controllers;
@@ -15,24 +16,24 @@ namespace Drum
 {
     public class MethodHandler
     {
-        public MethodHandler(MethodInfo method, RouteEntry newRoute)
+        public MethodHandler(MethodInfo method, RouteEntry newRoute, Func<HttpRequestMessage, ICollection<RouteEntry>, RouteEntry> routeSelector)
         {
-            RouteEntry = newRoute;
+            _routeSelector = routeSelector ?? ((req, coll) => coll.First());
+            RouteEntries = new Collection<RouteEntry> {newRoute};
             ParameterHandlers = method.GetParameters().Select(p => new ParameterHandler(p)).ToList();
         }
 
-        public RouteEntry RouteEntry { get; private set; }
+        public ICollection<RouteEntry> RouteEntries { get; private set; }
         public IReadOnlyCollection<ParameterHandler> ParameterHandlers { get; private set; }
+
+        private static readonly IDictionary<string,object> EmptyMap = new Dictionary<string, object>();
+        private readonly Func<HttpRequestMessage, ICollection<RouteEntry>, RouteEntry> _routeSelector;
 
         public Uri MakeUriFor(ReadOnlyCollection<Expression> arguments, UrlHelper urlHelper)
         {
-            return (ParameterHandlers.Any())
-                ? new Uri(
-                    urlHelper.Link(
-                        RouteEntry.Name,
-                        ComputeRouteMap(ComputeArgumentValues(arguments))))
-                : new Uri(urlHelper.Link(RouteEntry.Name, new {}));
-
+            var argumentValues = ParameterHandlers.Any() ? ComputeRouteMap(ComputeArgumentValues(arguments)) : EmptyMap;
+            var routeEntry = _routeSelector(urlHelper.Request, RouteEntries);
+            return new Uri(urlHelper.Link(routeEntry.Name, argumentValues));
         }
 
         public IDictionary<string, object> GetRouteMapFor(ReadOnlyCollection<Expression> arguments)
@@ -126,11 +127,13 @@ namespace Drum
     internal class DecoratorRouteProvider : IDirectRouteProvider
     {
         private readonly IDirectRouteProvider _provider;
+        private readonly Func<HttpRequestMessage, ICollection<RouteEntry>, RouteEntry> _routeSelector;
         private readonly IDictionary<MethodInfo, MethodHandler> _map = new Dictionary<MethodInfo, MethodHandler>(); 
 
-        public DecoratorRouteProvider(IDirectRouteProvider provider)
+        public DecoratorRouteProvider(IDirectRouteProvider provider, Func<HttpRequestMessage, ICollection<RouteEntry>, RouteEntry> routeSelector = null)
         {
             _provider = provider;
+            _routeSelector = routeSelector;
             RouteMap = methodInfo =>
             {
                 MethodHandler entry;
@@ -163,9 +166,13 @@ namespace Drum
                     MethodHandler prevEntry;
                     if (_map.TryGetValue(method, out prevEntry))
                     {
-                        throw new MultipleRoutesForSameMethodException(reflDesc, prevEntry.RouteEntry, newRoute);
+                        prevEntry.RouteEntries.Add(newRoute);
+                        //throw new MultipleRoutesForSameMethodException(reflDesc, prevEntry.RouteEntry, newRoute);
                     }
-                    _map.Add(method, new MethodHandler(method, newRoute));
+                    else
+                    {
+                        _map.Add(method, new MethodHandler(method, newRoute, _routeSelector));
+                    }
                 }
             }
             return list;
