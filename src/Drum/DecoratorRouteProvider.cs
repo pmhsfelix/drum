@@ -102,7 +102,7 @@ namespace Drum
             {
                 var fromUriAttributes = parameterInfo.GetCustomAttributes(typeof(FromUriAttribute), false);
                 var fromUriAttribute = fromUriAttributes.FirstOrDefault() as FromUriAttribute;
-                var nameFormat = fromUriAttribute != null ? string.Format("{0}.{{0}}", fromUriAttribute.Name) : "{0}";
+                var nameFormat = fromUriAttribute != null && !string.IsNullOrEmpty(fromUriAttribute.Name)? string.Format("{0}.{{0}}", fromUriAttribute.Name) : "{0}";
 
                 var type = parameterInfo.ParameterType;
                 var typeDesc = new AssociatedMetadataTypeTypeDescriptionProvider(type).GetTypeDescriptor(type);
