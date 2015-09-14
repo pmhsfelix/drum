@@ -50,24 +50,21 @@ namespace Drum
         }
     }
 
-    public class UriMaker<TController>
+    public class UriMaker<TController> : UriMaker
     {
-        private readonly UriMaker _uriMaker;
-
         public Uri UriFor(Expression<Action<TController>> action)
         {
-            return _uriMaker.UriFor(action);
+            return base.UriFor(action);
         }
 
         public Uri UriFor(Expression<Func<TController, object>> action)
         {
-            return _uriMaker.UriFor(action);
+            return base.UriFor(action);
         }
 
         public UriMaker(Func<MethodInfo, MethodHandler> mapper, UrlHelper urlHelper)
-        {
-            _uriMaker = new UriMaker(mapper, urlHelper);
-        }
+        : base(mapper, urlHelper)
+        {}
 
         public UriMaker(UriMakerContext fact, HttpRequestMessage req)
             : this(fact.RouteMap, new UrlHelper(req))
