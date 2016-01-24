@@ -24,6 +24,20 @@ namespace Drum
             return uriMakerContext;
         }
 
+        public static UriMakerContext MapHttpAttributeRoutesAndUseUriMaker(
+            this HttpConfiguration configuration,           
+            IInlineConstraintResolver constraintResolver,
+            IDirectRouteProvider directRouteProvider = null,
+            Func<HttpRequestMessage, ICollection<RouteEntry>, RouteEntry> routeSelector = null)
+        {
+            directRouteProvider = directRouteProvider ?? new DefaultDirectRouteProvider();
+            var decorator = new DecoratorRouteProvider(directRouteProvider, routeSelector);
+            configuration.MapHttpAttributeRoutes(constraintResolver, decorator);
+            var uriMakerContext = new UriMakerContext(decorator.RouteMap);
+            configuration.Properties.AddOrUpdate(ContextKey, _ => uriMakerContext, (_, __) => uriMakerContext);
+            return uriMakerContext;
+        }
+
         internal static UriMakerContext TryGetUriMakerContext(this HttpConfiguration config)
         {
             object contextObject;
