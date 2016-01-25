@@ -36,6 +36,12 @@ namespace Drum.Tests
 
             [Route("{id}")]
             public void GetById(int id, bool detailed) { }
+
+            [Route("")]
+            public void GetPagedWithExcplicitName([FromUri(Name = "pager")]PageInfo page) { }
+
+            [Route("")]
+            public void GetPagedWithoutName([FromUri]PageInfo page) { }
         }
         
         [Fact]
@@ -78,6 +84,20 @@ namespace Drum.Tests
         {
             var uri = _uriMaker.UriFor(c => c.GetPaged(new PageInfo{page = 2,count = 10}, true));
             Assert.Equal("http://example.org/api/UriMakerTests/resources?page=2&count=10&detailed=True", uri.ToString());
+        }
+
+        [Fact]
+        public void Can_make_uri_for_action_with_complex_named_uri_parameters()
+        {
+            var uri = _uriMaker.UriFor(c => c.GetPagedWithExcplicitName(new PageInfo { page = 5, count = 15 }));
+            Assert.Equal("http://example.org/api/UriMakerTests/resources?pager.page=5&pager.count=15", uri.ToString());
+        }
+
+        [Fact]
+        public void Can_make_uri_for_action_with_complex_uri_parameters_with_FromUri()
+        {
+            var uri = _uriMaker.UriFor(c => c.GetPagedWithoutName(new PageInfo { page = 5, count = 15 }));
+            Assert.Equal("http://example.org/api/UriMakerTests/resources?page=5&count=15", uri.ToString());
         }
         
         public UriMakerTests()
