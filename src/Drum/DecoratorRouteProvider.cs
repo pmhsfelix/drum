@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http;
@@ -33,21 +35,47 @@ namespace Drum
         public Uri MakeUriFor(ReadOnlyCollection<Expression> arguments, UrlHelper urlHelper)
         {
             var argumentValues = ParameterHandlers.Any() ? ComputeRouteMap(ComputeArgumentValues(arguments)) : EmptyMap;
-            var map = new Dictionary<string, object>();
+            var mapForUrlHelper = new Dictionary<string, object>();
+            var mapForQueryString = new Dictionary<string, IEnumerable>();
             if (urlHelper.Request.GetRouteData() != null && urlHelper.Request.GetRouteData().GetSubRoutes() != null)
             {
                 foreach (var p in urlHelper.Request.GetRouteData().GetSubRoutes().SelectMany(r => r.Values))
                 {
-                    map[p.Key] = p.Value;
+                    mapForUrlHelper[p.Key] = p.Value;
                 }
             }
             foreach (var p in argumentValues)
             {
-                map[p.Key] = p.Value;
+                var arr = p.Value as IEnumerable;
+                if (arr == null || p.Value is string)
+                {
+                    mapForUrlHelper[p.Key] = p.Value;
+                }
+                else
+                {
+                    mapForQueryString[p.Key] = arr;
+                }
             }
 
             var routeEntry = _routeSelector(urlHelper.Request, RouteEntries);
-            return new Uri(urlHelper.Link(routeEntry.Name, map));
+            var uri = new Uri(urlHelper.Link(routeEntry.Name, mapForUrlHelper));
+            if(mapForQueryString.Count == 0)
+            {
+                return uri;
+            }
+            var uriBuilder = new UriBuilder(uri);
+            var query = uri.ParseQueryString();
+            foreach(var pair in mapForQueryString)
+            {
+                var key = pair.Key;
+                var arr = pair.Value;
+                foreach(var value in arr)
+                {
+                    query.Add(key, Convert.ToString(value, CultureInfo.InvariantCulture));
+                }
+            }            
+            uriBuilder.Query = query.ToString();
+            return uriBuilder.Uri;
         }
 
         public IDictionary<string, object> GetRouteMapFor(ReadOnlyCollection<Expression> arguments)
@@ -90,14 +118,14 @@ namespace Drum
     {
         public ParameterHandler(ParameterInfo parameterInfo)
         {
-            if (IsSimpleType(parameterInfo.ParameterType))
+            if (IsSimpleType(parameterInfo.ParameterType) || IsEnumerable(parameterInfo.ParameterType))
             {
                 GetRouteValues =
                     new ReadOnlyCollection<RouteValueHandler>(new List<RouteValueHandler>()
                     {
                         new RouteValueHandler(parameterInfo.Name, v => v)
                     });
-            }
+            }            
             else
             {
                 var type = parameterInfo.ParameterType;
@@ -113,6 +141,11 @@ namespace Drum
         private bool IsSimpleType(Type parameterType)
         {
             return TypeDescriptor.GetConverter(parameterType).CanConvertFrom(typeof(string));
+        }
+
+        private bool IsEnumerable(Type parameterType)
+        {
+            return typeof(IEnumerable).IsAssignableFrom(parameterType);
         }
 
         public bool IsFromUri { get; private set; }

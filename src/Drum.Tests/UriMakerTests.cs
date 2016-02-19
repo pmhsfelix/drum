@@ -36,6 +36,16 @@ namespace Drum.Tests
 
             [Route("{id}")]
             public void GetById(int id, bool detailed) { }
+
+            [Route("byids")]
+            public void GetByIds(int[] id) { }
+
+            [Route("byids2")]
+            public void GetByIds(string[] id) { }
+
+            [Route("byids3/{seg}/")]
+            public void GetByIds(string seg, string q, string[] id) { }
+
         }
         
         [Fact]
@@ -79,7 +89,28 @@ namespace Drum.Tests
             var uri = _uriMaker.UriFor(c => c.GetPaged(new PageInfo{page = 2,count = 10}, true));
             Assert.Equal("http://example.org/api/UriMakerTests/resources?page=2&count=10&detailed=True", uri.ToString());
         }
-        
+
+        [Fact]
+        public void Can_make_uri_for_action_with_int_array()
+        {
+            var uri = _uriMaker.UriFor(c => c.GetByIds(new[] { 1, 2, 3 }));
+            Assert.Equal("http://example.org/api/UriMakerTests/resources/byids?id=1&id=2&id=3", uri.ToString());
+        }
+
+        [Fact]
+        public void Can_make_uri_for_action_with_string_array()
+        {
+            var uri = _uriMaker.UriFor(c => c.GetByIds(new[] { "1", "a", "=" }));
+            Assert.Equal("http://example.org/api/UriMakerTests/resources/byids2?id=1&id=a&id=%3d", uri.ToString());
+        }
+
+        [Fact]
+        public void Can_make_uri_for_action_with_string_array_and_others()
+        {
+            var uri = _uriMaker.UriFor(c => c.GetByIds("path","qvalue",new[] { "1", "a", "=" }));
+            Assert.Equal("http://example.org/api/UriMakerTests/resources/byids3/path?q=qvalue&id=1&id=a&id=%3d", uri.ToString());
+        }
+
         public UriMakerTests()
         {
             var config = new HttpConfiguration();
